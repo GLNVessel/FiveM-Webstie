@@ -37,65 +37,65 @@ app.get('/', async (req, res) => {
     return res.sendFile('index.html', { root: '.' });
 });
 
-app.get('/servers', async (req, res) => {
-    const { code } = req.query;
-
-    // If there's a code, exchange it for an access token
-    if (code) {
-        try {
-            const tokenResponseData = await request('https://discord.com/api/oauth2/token', {
-                method: 'POST',
-                body: new URLSearchParams({
-                    client_id: clientId,
-                    client_secret: clientSecret,
-                    code,
-                    grant_type: 'authorization_code',
-                    redirect_uri: `https://fivemdiscordbot.netlify.app/servers`,
-                    scope: 'identify guilds',
-                }).toString(),
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
-
-            const oauthData = await tokenResponseData.body.json();
-
-            if (oauthData.error) {
-                return res.send(`OAuth Error: ${oauthData.error_description}`);
-            }
-
-            // Store the access token in session
-            req.session.accessToken = oauthData.access_token;
-
-            // Fetch the user's profile data
-            const userProfileResponse = await request('https://discord.com/api/users/@me', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${req.session.accessToken}`,
-                },
-            });
-
-            const userProfile = await userProfileResponse.body.json();
-            req.session.userProfile = userProfile;
-
-            // Redirect to /servers without the code
-            return res.redirect('/servers');
-        } catch (error) {
-            console.error('Error during token request:', error);
-            return res.status(500).send('Internal Server Error');
-        }
-    }
-
+app.get('/api/user-data', async (req, res) => {
     // If there's no code, check if we have an access token in the session
     const accessToken = req.session.accessToken;
     if (!accessToken) {
-        return res.send('No code provided');
+        return res.status(401).json({ error: 'No access token found' });
     }
 
-    // Serve the servers.html file
-    return res.sendFile(path.join(__dirname, 'public', 'servers.html'));
+    try {
+        // Fetch user's profile data and guilds
+        const userProfileResponse = await request('https://discord.com/api/users/@me', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        const userProfile = await userProfileResponse.body.json();
+
+        const guildsResponseData = await request('https://discord.com/api/users/@me/guilds', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        const userGuilds = await guildsResponseData.body.json();
+
+        const botGuildsResponseData = await request('https://discord.com/api/v10/users/@me/guilds', {
+            method: 'GET',
+            headers: { 'Authorization': `Bot ${botToken}` },
+        });
+        const botGuilds = await botGuildsResponseData.body.json();
+
+        const botGuildIds = new Set(botGuilds.map(guild => guild.id));
+
+        // Separate guilds
+        const botInGuilds = [];
+        const botNotInGuilds = [];
+        userGuilds.forEach(guild => {
+            if ((guild.permissions & 0x20) === 0x20) { // MANAGE_GUILD permission
+                if (botGuildIds.has(guild.id)) {
+                    botInGuilds.push(guild);
+                } else {
+                    botNotInGuilds.push(guild);
+                }
+            }
+        });
+
+        // Send the data to the frontend
+        res.json({
+            userProfile,
+            guilds: [...botInGuilds, ...botNotInGuilds],
+            inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=http://localhost:${port}/servers`
+        });
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return res.status(500).json({ error: 'Failed to fetch data' });
+    }
 });
 
+// Route to serve the servers.html file
+app.get('/servers', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'servers.html'));
+});
 
 // New route to render the server details page
 app.get('/server', async (req, res) => {
