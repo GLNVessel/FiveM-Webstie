@@ -41,71 +41,102 @@ app.get('/', (req, res) => {
 });
 
 // Fetch user data and guilds for servers.html
+// app.get('/api/user-data', async (req, res) => {
+//     const accessToken = req.session.accessToken;
+
+//     // Check if access token is available in session
+//     if (!accessToken) {
+//         return res.status(401).json({ error: 'No access token found' });
+//     }
+
+//     try {
+//         // Fetch user's profile data
+//         const userProfileResponse = await request('https://discord.com/api/users/@me', {
+//             method: 'GET',
+//             headers: {
+//                 'Authorization': `Bearer ${accessToken}`,
+//             },
+//         });
+//         const userProfile = await userProfileResponse.body.json();
+        
+//         // Fetch user's guilds using the access token
+//         const guildsResponse = await request('https://discord.com/api/users/@me/guilds', {
+//             method: 'GET',
+//             headers: {
+//                 'Authorization': `Bearer ${accessToken}`,
+//             },
+//         });
+//         const userGuilds = await guildsResponse.body.json();
+
+//         // Fetch the bot's guilds using the bot token
+//         const botGuildsResponse = await request('https://discord.com/api/v10/users/@me/guilds', {
+//             method: 'GET',
+//             headers: {
+//                 'Authorization': `Bot ${botToken}`,
+//             },
+//         });
+//         const botGuilds = await botGuildsResponse.body.json();
+
+//         // Convert botGuilds to a Set for fast lookup
+//         const botGuildIds = new Set(botGuilds.map(guild => guild.id));
+
+//         // Separate manageable guilds
+//         const botInGuilds = [];
+//         const botNotInGuilds = [];
+
+//         userGuilds.forEach(guild => {
+//             if ((guild.permissions & 0x20) === 0x20) { // MANAGE_GUILD permission
+//                 if (botGuildIds.has(guild.id)) {
+//                     botInGuilds.push(guild);
+//                 } else {
+//                     botNotInGuilds.push(guild);
+//                 }
+//             }
+//         });
+
+//         // Send user profile, guilds, and bot invite link to the client
+//         res.json({
+//             userProfile,
+//             guilds: [...botInGuilds, ...botNotInGuilds],
+//             inviteUrl: `https://discord.com/oauth2/authorize?client_id=1280618676877262989&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Ffivemdiscordbot.netlify.app%2Fservers&integration_type=0&scope=bot`
+//         });
+
+//     } catch (error) {
+//         console.error('Error fetching data:', error);
+//         return res.status(500).json({ error: 'Failed to fetch data' });
+//     }
+// });
+
 app.get('/api/user-data', async (req, res) => {
     const accessToken = req.session.accessToken;
-
-    // Check if access token is available in session
     if (!accessToken) {
         return res.status(401).json({ error: 'No access token found' });
     }
 
     try {
-        // Fetch user's profile data
+        // Fetch user's profile data and guilds
         const userProfileResponse = await request('https://discord.com/api/users/@me', {
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-            },
+            headers: { 'Authorization': `Bearer ${accessToken}` },
         });
         const userProfile = await userProfileResponse.body.json();
-        
-        // Fetch user's guilds using the access token
-        const guildsResponse = await request('https://discord.com/api/users/@me/guilds', {
+
+        const guildsResponseData = await request('https://discord.com/api/users/@me/guilds', {
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-            },
+            headers: { 'Authorization': `Bearer ${accessToken}` },
         });
-        const userGuilds = await guildsResponse.body.json();
+        const userGuilds = await guildsResponseData.body.json();
 
-        // Fetch the bot's guilds using the bot token
-        const botGuildsResponse = await request('https://discord.com/api/v10/users/@me/guilds', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bot ${botToken}`,
-            },
-        });
-        const botGuilds = await botGuildsResponse.body.json();
-
-        // Convert botGuilds to a Set for fast lookup
-        const botGuildIds = new Set(botGuilds.map(guild => guild.id));
-
-        // Separate manageable guilds
-        const botInGuilds = [];
-        const botNotInGuilds = [];
-
-        userGuilds.forEach(guild => {
-            if ((guild.permissions & 0x20) === 0x20) { // MANAGE_GUILD permission
-                if (botGuildIds.has(guild.id)) {
-                    botInGuilds.push(guild);
-                } else {
-                    botNotInGuilds.push(guild);
-                }
-            }
-        });
-
-        // Send user profile, guilds, and bot invite link to the client
         res.json({
             userProfile,
-            guilds: [...botInGuilds, ...botNotInGuilds],
-            inviteUrl: `https://discord.com/oauth2/authorize?client_id=1280618676877262989&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Ffivemdiscordbot.netlify.app%2Fservers&integration_type=0&scope=bot`
+            guilds: userGuilds,
         });
-
     } catch (error) {
         console.error('Error fetching data:', error);
         return res.status(500).json({ error: 'Failed to fetch data' });
     }
 });
+
 
 // Serve the servers.html file
 app.get('/servers', (req, res) => {
