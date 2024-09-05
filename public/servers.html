@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html> 
+    <head>
+        <title>Your Servers</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #202225;
+                color: #fff;
+                text-align: center;
+                margin: 0;
+                padding: 0;
+            }
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 20px;
+                background-color: #2f3136;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .navbar h1 {
+                margin: 0;
+                color: #fff;
+            }
+            .profile-container {
+                position: relative;
+                display: inline-block;
+            }
+            .profile-pic {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                cursor: pointer;
+            }
+            .logout-btn {
+                display: none;
+                position: absolute;
+                top: 50px;
+                right: 0;
+                background-color: #7289da;
+                color: #fff;
+                padding: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .profile-container:hover .logout-btn {
+                display: block;
+            }
+            .grid-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 20px;
+                padding: 20px;
+            }
+            .card {
+                background-color: #2f3136;
+                border-radius: 10px;
+                padding: 20px;
+                text-align: center;
+                position: relative;
+                transition: transform 0.2s;
+                cursor: pointer;
+            }
+            .card:hover {
+                transform: scale(1.05);
+            }
+            .card img {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+            }
+            .card h3 {
+                font-size: 16px;
+                margin: 10px 0;
+            }
+            .plus-icon {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 24px;
+                height: 24px;
+                background-color: green;
+                color: white;
+                border-radius: 50%;
+                font-size: 18px;
+                line-height: 24px;
+            }
+            .button {
+                margin-top: 20px;
+                padding: 10px 20px;
+                background-color: #7289da;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .button:hover {
+                background-color: #5b6eae;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="navbar">
+            <h1>Your Servers</h1>
+            <div class="profile-container">
+                <img src="${req.session.userProfile.avatar ? `https://cdn.discordapp.com/avatars/${req.session.userProfile.id}/${req.session.userProfile.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="profile-pic" alt="Profile Picture">
+                <div class="logout-btn" onclick="window.location.href='/logout'">Logout</div>
+            </div>
+        </div>
+<div class="grid-container">
