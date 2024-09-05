@@ -120,35 +120,41 @@
     <script>
         // Fetch session data and dynamically update HTML
         window.onload = async function() {
-            const response = await fetch('/api/user-data');
-            const data = await response.json();
-            
-            document.getElementById('profile-pic').src = data.userProfile.avatar 
-                ? `https://cdn.discordapp.com/avatars/${data.userProfile.id}/${data.userProfile.avatar}.png`
-                : 'https://cdn.discordapp.com/embed/avatars/0.png';
+    try {
+        const response = await fetch('/servers');
+        const data = await response.json();
 
-            const guildContainer = document.getElementById('guild-container');
-            data.guilds.forEach(guild => {
-                const iconUrl = guild.icon 
-                    ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
-                    : 'https://via.placeholder.com/64';
-                guildContainer.innerHTML += `
-                    <div class="card" onclick="window.location.href='/server?guildId=${guild.id}'">
-                        <img src="${iconUrl}" alt="${guild.name}">
-                        <h3>${guild.name}</h3>
-                    </div>
-                `;
-            });
+        // Updating profile picture
+        document.getElementById('profile-pic').src = data.userProfile.avatar 
+            ? `https://cdn.discordapp.com/avatars/${data.userProfile.id}/${data.userProfile.avatar}.png`
+            : 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-            // Optionally: Add bot invite button dynamically
+        // Populate guild container
+        const guildContainer = document.getElementById('guild-container');
+        data.guilds.forEach(guild => {
+            const iconUrl = guild.icon 
+                ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+                : 'https://via.placeholder.com/64';
             guildContainer.innerHTML += `
-                <div class="card" onclick="window.location.href='${data.inviteUrl}'">
-                    <img src="https://cdn.discordapp.com/icons/placeholder.png" alt="Invite Bot">
-                    <h3>Invite Bot to Your Server</h3>
-                    <div class="plus-icon">+</div>
+                <div class="card" onclick="window.location.href='/server?guildId=${guild.id}'">
+                    <img src="${iconUrl}" alt="${guild.name}">
+                    <h3>${guild.name}</h3>
                 </div>
             `;
-        };
+        });
+
+        // Add bot invite button dynamically
+        guildContainer.innerHTML += `
+            <div class="card" onclick="window.location.href='${data.inviteUrl}'">
+                <img src="https://cdn.discordapp.com/icons/placeholder.png" alt="Invite Bot">
+                <h3>Invite Bot to Your Server</h3>
+                <div class="plus-icon">+</div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error fetching server data:', error);
+    }
+};
     </script>
 </body>
 </html>
