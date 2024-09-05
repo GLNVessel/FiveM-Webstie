@@ -83,7 +83,7 @@ app.get('/api/user-data', async (req, res) => {
         res.json({
             userProfile,
             guilds: [...botInGuilds, ...botNotInGuilds],
-            inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=http://localhost:${port}/servers`
+            inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=fivemdiscordbot.netlify.app/servers`
         });
 
     } catch (error) {
