@@ -37,7 +37,7 @@ window.onload = async function() {
                     ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
                     : 'https://via.placeholder.com/64';
                 guildContainer.innerHTML += `
-                    <div class="card" onclick="window.location.href='/server?guildId=${guild.id}'">
+                    <div class="card" onclick="window.location.href='/servers?guildId=${guild.id}'">
                         <img src="${iconUrl}" alt="${guild.name}">
                         <h3>${guild.name}</h3>
                     </div>
