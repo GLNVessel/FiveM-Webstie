@@ -20,9 +20,12 @@
     <button class="button" onclick="window.location.href = window.location.href.split('?')[0];">Refresh list</button>
 
     <script>
-        window.onload = async function() {
-            const response = await fetch('/api/user-data');
-            const data = await response.json();
+
+window.onload = async function() {
+    const response = await fetch('/api/user-data');
+    if (response.ok) {
+        const data = await response.json();
+       
             
             document.getElementById('profile-pic').src = data.userProfile.avatar 
                 ? `https://cdn.discordapp.com/avatars/${data.userProfile.id}/${data.userProfile.avatar}.png`
@@ -49,6 +52,10 @@
                     <div class="plus-icon">+</div>
                 </div>
             `;
+    } else {
+        console.error('Failed to load user data');
+    }
+              
         };
     </script>
 </body>
