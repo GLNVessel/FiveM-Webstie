@@ -48,7 +48,7 @@ app.get('/servers', async (req, res) => {
                     client_secret: clientSecret,
                     code,
                     grant_type: 'authorization_code',
-                    redirect_uri: 'https://fivembusinessmanagementtool.com/servers',
+                    redirect_uri: 'https://fivemdiscordbot.netlify.app/servers',
                     scope: 'identify guilds',
                 }).toString(),
                 headers: {
