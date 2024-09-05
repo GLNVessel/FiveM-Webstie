@@ -37,7 +37,7 @@ app.get('/', async (req, res) => {
     return res.sendFile('index.html', { root: '.' });
 });
 
-app.get('/api/user-data', async (req, res) => {
+app.get('/servers', async (req, res) => {
     const accessToken = req.session.accessToken;
     if (!accessToken) {
         return res.status(401).json({ error: 'No access token found' });
@@ -50,21 +50,18 @@ app.get('/api/user-data', async (req, res) => {
             headers: { 'Authorization': `Bearer ${accessToken}` },
         });
         const userProfile = await userProfileResponse.body.json();
-        console.log("User profile:", userProfile);
 
         const guildsResponseData = await request('https://discord.com/api/users/@me/guilds', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${accessToken}` },
         });
         const userGuilds = await guildsResponseData.body.json();
-        console.log("User guilds:", userGuilds);
 
         const botGuildsResponseData = await request('https://discord.com/api/v10/users/@me/guilds', {
             method: 'GET',
             headers: { 'Authorization': `Bot ${botToken}` },
         });
         const botGuilds = await botGuildsResponseData.body.json();
-        console.log("Bot guilds:", botGuilds);
 
         const botGuildIds = new Set(botGuilds.map(guild => guild.id));
 
@@ -81,13 +78,11 @@ app.get('/api/user-data', async (req, res) => {
             }
         });
 
-        console.log("Bot in guilds:", botInGuilds);
-        console.log("Bot not in guilds:", botNotInGuilds);
-
+        // Return JSON to be consumed by frontend
         res.json({
             userProfile,
             guilds: [...botInGuilds, ...botNotInGuilds],
-            inviteUrl: `https://discord.com/oauth2/authorize?client_id=1280618676877262989&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Ffivemdiscordbot.netlify.app%2Fservers&integration_type=0&scope=bot`
+            inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=https://your-redirect-url.com/servers`
         });
 
     } catch (error) {
@@ -95,6 +90,7 @@ app.get('/api/user-data', async (req, res) => {
         return res.status(500).json({ error: 'Failed to fetch data' });
     }
 });
+
 
 // Route to serve the servers.html file
 app.get('/servers', (req, res) => {
