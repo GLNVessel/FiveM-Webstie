@@ -11,7 +11,7 @@ app.use(session({
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true } // Set secure to true if using HTTPS
+    cookie: { secure: false } // Set secure to true if using HTTPS
 }));
 
 const db = mysql.createConnection({
@@ -48,7 +48,7 @@ app.get('/servers', async (req, res) => {
                     client_secret: clientSecret,
                     code,
                     grant_type: 'authorization_code',
-                    redirect_uri: 'https://fivemdiscordbot.netlify.app/servers',
+                    redirect_uri: `https://fivemdiscordbot.netlify.app/servers`,
                     scope: 'identify guilds',
                 }).toString(),
                 headers: {
@@ -249,7 +249,7 @@ app.get('/servers', async (req, res) => {
         `;
 
         // Add the "Invite Bot to Server" card
-        const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=https://fivembusinessmanagementtool.com/servers`;
+        const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=http://localhost:${port}/servers`;
         guildsHtml += `
             <div class="card" onclick="window.location.href='${inviteUrl}'">
                 <img src="https://cdn.discordapp.com/icons/placeholder.png" alt="Invite Bot">
@@ -576,7 +576,5 @@ app.get('/logout', (req, res) => {
         res.redirect('http://localhost:53134');
     });
 });
-
-const port = process.env.PORT || 80;
 
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
