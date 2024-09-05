@@ -85,6 +85,8 @@ app.get('/servers', async (req, res) => {
             inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=https://your-redirect-url.com/servers`
         });
 
+        res.sendFile(path.join(__dirname, 'public', 'servers.html'));
+
     } catch (error) {
         console.error('Error fetching data:', error);
         return res.status(500).json({ error: 'Failed to fetch data' });
@@ -93,9 +95,9 @@ app.get('/servers', async (req, res) => {
 
 
 // Route to serve the servers.html file
-app.get('/servers', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'servers.html'));
-});
+// app.get('/servers', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'servers.html'));
+// });
 
 // New route to render the server details page
 app.get('/server', async (req, res) => {
