@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Invoices</title>
+    <style>
+        /* Add your styles here */
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="/server">Main</a>
+        <a href="#" class="active">User Invoices</a>
+    </div>
+    <div class="content">
+        <h1>User Invoices</h1>
+        <table id="invoiceTable">
+            <tr>
+                <th>User</th>
+                <th>Total Price</th>
+                <th>Commission Percentage</th>
+                <th>Commission Amount</th>
+            </tr>
+        </table>
+    </div>
+    <script>
+        // Fetch and display invoices based on guildId
+        const urlParams = new URLSearchParams(window.location.search);
+        const guildId = urlParams.get('guildId');
+        fetch(`/api/invoices?guildId=${guildId}`)
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById('invoiceTable');
+                data.forEach(invoice => {
+                    const row = `<tr>
+                        <td>${invoice.username}</td>
+                        <td>${invoice.total_price}</td>
+                        <td>${invoice.percentage}%</td>
+                        <td>${invoice.commission}</td>
+                    </tr>`;
+                    table.innerHTML += row;
+                });
+            });
+    </script>
+</body>
+</html>
