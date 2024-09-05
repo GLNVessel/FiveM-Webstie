@@ -82,7 +82,7 @@ app.get('/servers', async (req, res) => {
         res.json({
             userProfile,
             guilds: [...botInGuilds, ...botNotInGuilds],
-            inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=https://your-redirect-url.com/servers`
+            inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot&response_type=code&redirect_uri=https://fivemdiscordbot.netlify.app/servers`
         });
 
         res.sendFile(path.join(__dirname, 'public', 'servers.html'));
